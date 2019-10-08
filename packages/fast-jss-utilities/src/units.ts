@@ -7,3 +7,13 @@ export function toPx<T>(arg: any): any {
           }
         : `${arg}px`;
 }
+
+export function toMs<T>(func: (designSystem: T) => number): (designSystem: T) => string;
+export function toMs(item: number): string;
+export function toMs<T>(arg: any): any {
+    return typeof arg === "function"
+        ? (designSystem: T): string => {
+              return toMs(arg(designSystem) as number);
+          }
+        : `${arg}ms`;
+}

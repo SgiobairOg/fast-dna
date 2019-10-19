@@ -16,6 +16,7 @@ import {
     ViewportPositionerHorizontalPosition,
     ViewportPositionerVerticalPosition,
 } from "./viewport-positioner.props";
+import Button from "../button";
 
 /*
  * Configure Enzyme
@@ -1520,5 +1521,31 @@ describe("viewport positioner", (): void => {
             );
         expect(positionerDimension.width).toBe(100);
         expect(positionerDimension.height).toBe(100);
+    });
+
+    test("getNextPositionerDimension extracts dom elements from React component refs", (): void => {
+        const anchorElement: React.RefObject<any> = React.createRef();
+
+        const rendered: any = mount(
+            <div>
+                <Button ref={anchorElement} />
+                <ViewportPositioner
+                    viewport={document.firstElementChild as HTMLElement}
+                    horizontalPositioningMode={AxisPositioningMode.adjacent}
+                    defaultHorizontalPosition={ViewportPositionerHorizontalPosition.left}
+                    verticalPositioningMode={AxisPositioningMode.adjacent}
+                    defaultVerticalPosition={ViewportPositionerVerticalPosition.top}
+                    anchor={anchorElement}
+                    managedClasses={managedClasses}
+                />
+            </div>
+        );
+
+        const positioner: any = rendered.find("BaseViewportPositioner");
+
+        expect(
+            positioner.instance()["extractElementFromRef"](anchorElement) instanceof
+                HTMLElement
+        ).toBe(true);
     });
 });

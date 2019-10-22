@@ -274,25 +274,7 @@ export function rescale(
     const stops: ColorScaleStop[] = new Array(input.length);
 
     if (preserveInputColors) {
-        for (let i: number = 0; i < input.length; i++) {
-            const p: number = i / (input.length - 1);
-            let bestFitValue: number = 2;
-            let bestFitIndex: number = 0;
-            for (let j: number = 0; j < targetSize; j++) {
-                const fitValue: number = Math.abs(j / (targetSize - 1) - p);
-                if (fitValue < bestFitValue) {
-                    bestFitValue = fitValue;
-                    bestFitIndex = j;
-                }
-                if (fitValue === 0) {
-                    break;
-                }
-            }
-            stops[i] = {
-                color: input[i],
-                position: bestFitIndex / (targetSize - 1),
-            };
-        }
+        stops.push(...calculateBestFitStops(input, targetSize));
     } else {
         for (let i: number = 0; i < stops.length; i++) {
             stops[i] = { color: input[i], position: i / (input.length - 1) };
@@ -307,6 +289,30 @@ export function rescale(
     }
 
     return retVal;
+}
+
+function calculateBestFitStops(input : ColorRGBA64[], targetSize : number): ColorScaleStop[] {
+    let stops : ColorScaleStop[] = [];
+    for (let i: number = 0; i < input.length; i++) {
+        const p: number = i / (input.length - 1);
+        let bestFitValue: number = 2;
+        let bestFitIndex: number = 0;
+        for (let j: number = 0; j < targetSize; j++) {
+            const fitValue: number = Math.abs(j / (targetSize - 1) - p);
+            if (fitValue < bestFitValue) {
+                bestFitValue = fitValue;
+                bestFitIndex = j;
+            }
+            if (fitValue === 0) {
+                break;
+            }
+        }
+        stops[i] = {
+            color: input[i],
+            position: bestFitIndex / (targetSize - 1),
+        };
+    };
+    return stops;
 }
 
 export interface CenteredRescaleConfig {

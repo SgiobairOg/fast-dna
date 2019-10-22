@@ -254,6 +254,24 @@ export function generateOffCenterPalette(
     });
 }
 
+export function handleError(message) {
+    throw new  Error(message);
+}
+
+export function validateInputs(input: ColorRGBA64[], targetSize: number, preserveInputColors: boolean) {
+    if (input.length <= 1) {
+        handleError("The input array and targetSize must both be greater than 1");
+    }
+    if (targetSize <= 1) {
+        handleError("The input array and targetSize must both be greater than 1");
+    }
+    if (preserveInputColors && targetSize <= input.length) {
+        handleError(
+            "If preserveInputColors is true then targetSize must be greater than the length of the input array"
+        );
+    }
+}
+
 /**
  * Take the input array of colors and extrapolates them to a larger palette of size targetSize. If preserveInputColors is false the input colors are evenly distributed into the output. Otherwise, the positions of the input colors are adjusted from a perfectly even distribution in order to ensure that the exact color values appearing in the input array also appear in the output array. The larger targetSize is compared to input.length the smaller those adjustments will be.
  */
@@ -262,14 +280,7 @@ export function rescale(
     targetSize: number,
     preserveInputColors: boolean
 ): ColorRGBA64[] {
-    if (input.length <= 1 || targetSize <= 1) {
-        throw new Error("The input array and targetSize must both be greater than 1");
-    }
-    if (preserveInputColors && targetSize <= input.length) {
-        throw new Error(
-            "If preserveInputColors is true then targetSize must be greater than the length of the input array"
-        );
-    }
+    validateInputs(input, targetSize, preserveInputColors);
 
     const stops: ColorScaleStop[] = new Array(input.length);
 
